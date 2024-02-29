@@ -1,4 +1,3 @@
-
-
-3. pack container
-4. review code
+1. add readme
+2. add swagger
+3. review code
