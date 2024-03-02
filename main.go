@@ -1,27 +1,30 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"time"
 
 	"com.jarikkomarik.linkshortener/config"
 	"com.jarikkomarik.linkshortener/controller"
+	"com.jarikkomarik.linkshortener/docs"
 	"com.jarikkomarik.linkshortener/middleware"
 	"com.jarikkomarik.linkshortener/repository"
 	"com.jarikkomarik.linkshortener/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title 	URL shortener API
+// @version	1.0
+// @description URL shortener API
+// @host 	localhost:8080
 func main() {
-
-	//setupDNS() //remove when deployed
-
 	setupEnv()
+	docs.SwaggerInfo.BasePath = ""
 
 	ginInstance := gin.Default()
 	repo := repository.NewLinkRepository(config.DatabaseConnection())
@@ -30,9 +33,11 @@ func main() {
 
 	ginInstance.Use(middleware.ErrorHandler())
 
-	ginInstance.POST("/", controller.HandlePost)
+	ginInstance.POST("/shorten", controller.HandlePost)
 
 	ginInstance.GET("/:id", controller.HandleGet)
+
+	ginInstance.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server := &http.Server{
 		Addr:           ":" + os.Getenv("SERVER_PORT"),
@@ -50,20 +55,6 @@ func main() {
 		panic(err)
 	}
 
-}
-
-func setupDNS() {
-	// Change the default DNS resolver in case of issue connect to Mongo
-	resolver := &net.Resolver{
-		PreferGo: true, // Use Go's DNS resolver implementation
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			// Customize DNS resolution here if needed
-			// For example, you can use a custom DNS server
-			return (&net.Dialer{}).DialContext(ctx, network, "8.8.4.4:53")
-		},
-	}
-
-	net.DefaultResolver = resolver
 }
 
 func setupEnv() {

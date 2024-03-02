@@ -1,0 +1,38 @@
+host: localhost:8080
+info:
+  contact: {}
+  description: URL shortener API
+  title: URL shortener API
+  version: "1.0"
+paths:
+  /{id}:
+    get:
+      description: Redirects to the original URL based on the provided ID
+      parameters:
+      - description: ID of the shortened URL
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Successfully redirected to the original resource
+          schema:
+            type: string
+      summary: Redirect to original URL
+  /shorten:
+    post:
+      description: Returns id that reffers to the original URL.
+      parameters:
+      - description: URL to be shortened
+        in: query
+        name: url
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Successfully registered new URL
+          schema:
+            type: string
+      summary: Register new URL
+swagger: "2.0"
