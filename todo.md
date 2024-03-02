@@ -1,2 +1,1 @@
-1. add readme
-2. pack container
+1. pack container
